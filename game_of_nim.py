@@ -8,10 +8,9 @@ class GameOfNim(Game):
     # YOUR CODE GOES HERE
     def __init__(self, board=[]):
         """ Define goal state and initialize a problem """
-        self.board = board
         moves = []
         r = 0
-        for row in self.board:
+        for row in board:
             if row != 0:
                 n = 1
                 while n <= row:
@@ -25,7 +24,7 @@ class GameOfNim(Game):
         moves = []
         r = 0
 
-        for row in state:
+        for row in state.board:
             if row != 0:
                 n = 1
                 while n <= row:
@@ -37,19 +36,13 @@ class GameOfNim(Game):
         
     def result(self, state, move):
         # move = (1,3), remove one from 1st row
-        new_state = []
+        new_board = state.board.copy()
         moves = []
-        i = 0
         r = 0
         
-        for row in state[2]:
-            if move[0] == i:
-                new_state.append(row - move[1])
-            else:
-                new_state.append(row)
-            i += 1
+        new_board[move[0]] = state.board[move[0]] - move[1]
 
-        for row in new_state:
+        for row in new_board:
             if row != 0:
                 n = 1
                 while n <= row:
@@ -57,15 +50,17 @@ class GameOfNim(Game):
                     n += 1
             r += 1
 
-        return new_state, moves     
+        return GameState(to_move=(state.to_move + 1) % 2, utility=0, board=new_board, moves=moves)   
+
+    def utility(self, state, player):
+        if player == 1:
+            return 1
+        else:
+            return -1
 
     def terminal_test(self, state):
-        r = 0
-        if r == len(state[0]):
-            return True
-        else:
-            while r < len(state[0]):
-                if r == len(state[0]):
-                    return True
-                else:
-                    r += 1
+        for row in state.board:
+            if row != 0:
+                return False
+
+        return True
