@@ -161,32 +161,26 @@ def set_blocks(blocks, player):
 def board_events(event,blocks):
     if event.type == pygame.MOUSEBUTTONDOWN:
         pos = pygame.mouse.get_pos()
-        for r in range(0, len(blocks)):
-            if r == 0:
-                if(r1_rect.collidepoint(pos)):
-                    if blocks[r] > 0:
-                        blocks[r] -= 1
-                    print(blocks[r])
-            if r == 1:
-                if(r2_rect.collidepoint(pos)):
-                    if blocks[r] > 0:
-                        blocks[r] -= 1
-                    print(blocks[r])
-            if r == 2:
-                if(r3_rect.collidepoint(pos)):
-                    if blocks[r] > 0:
-                        blocks[r] -= 1
-                    print(blocks[r])
-            if r == 3:
-                if(r4_rect.collidepoint(pos)):
-                    if blocks[r] > 0:
-                        blocks[r] -= 1
-                    print(blocks[r])
-            if r == 4:
-                if(r5_rect.collidepoint(pos)):
-                    if blocks[r] > 0:
-                        blocks[r] -= 1
-                    print(blocks[r])
+        if(r1_rect.collidepoint(pos)):
+            if blocks[0] > 0:
+                blocks[0] -= 1
+            print(blocks[0])
+        if(r2_rect.collidepoint(pos)):
+            if blocks[1] > 0:
+                blocks[1] -= 1
+            print(blocks[1])
+        if(r3_rect.collidepoint(pos)):
+            if blocks[2] > 0:
+                blocks[2] -= 1
+            print(blocks[2])
+        if(r4_rect.collidepoint(pos)):
+            if blocks[3] > 0:
+                blocks[3] -= 1
+            print(blocks[3])
+        if(r5_rect.collidepoint(pos)):
+            if blocks[4] > 0:
+                blocks[4] -= 1
+            print(blocks[4])
 
 def actions(blocks):
     moves = []
