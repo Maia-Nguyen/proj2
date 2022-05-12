@@ -16,14 +16,14 @@ SCREEN_WIDTH = 490
 SCREEN_HEIGHT = 490
 BASE_FONT = pygame.font.SysFont('arial',25)
 
-modified = -1
+modified = -1 # -1 when player hasn't taken their turn, row # when player has modified it
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption('Game of Nim')
 
 text_box = pygame.Rect(220,(SCREEN_HEIGHT/2+35), 50, 35)
 start_button = pygame.Rect(200,(SCREEN_HEIGHT/2+125), 90, 35)
 done_button = pygame.Rect(200,(SCREEN_HEIGHT/2+155), 90, 35)
-row_rects = []
+row_rects = [] # store row rects to register clicks
 
 # Start Menu
 def start():
@@ -93,6 +93,8 @@ def start():
         # update the screen
         pygame.display.update()
 
+# calculates WIDTH and HEIGHT based off of the number of columns and rows
+# + add rects to row_rects based on HEIGHT / row count
 def setup(blocks):
     global WIDTH, HEIGHT
 
