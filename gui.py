@@ -52,7 +52,7 @@ def start():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     input = input[:-1]
-                if event.key == pygame.K_RETURN:
+                elif event.key == pygame.K_RETURN:
                     if len(blocks) < 8:
                         blocks.append(int(input))
                         input = ''
