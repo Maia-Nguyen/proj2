@@ -14,37 +14,39 @@ MARGIN = 100
 SPACING = 10
 SCREEN_WIDTH = 490
 SCREEN_HEIGHT = 490
-BASE_FONT = pygame.font.SysFont('arial',25)
+BASE_FONT = pygame.font.SysFont('arial', 25)
 
-modified = -1 # -1 when player hasn't taken their turn, row # when player has modified it
-screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+modified = -1  # -1 when player hasn't taken their turn, row # when player has modified it
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Game of Nim')
 
-text_box = pygame.Rect(220,(SCREEN_HEIGHT/2+35), 50, 35)
-start_button = pygame.Rect(200,(SCREEN_HEIGHT/2+125), 90, 35)
-done_button = pygame.Rect(200,(SCREEN_HEIGHT/2+155), 90, 35)
-row_rects = [] # store row rects to register clicks
+text_box = pygame.Rect(220, (SCREEN_HEIGHT/2+35), 50, 35)
+start_button = pygame.Rect(200, (SCREEN_HEIGHT/2+125), 90, 35)
+done_button = pygame.Rect(200, (SCREEN_HEIGHT/2+155), 90, 35)
+row_rects = []  # store row rects to register clicks
 
 # Start Menu
+
+
 def start():
     start = True
     input = ''
     blocks = []
     output = ''
-    
+
     while start:
         # handle events
         for event in pygame.event.get():
             # quit game
             if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                pygame.quit()
+                sys.exit()
             # if user clicks start
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 if (start_button.collidepoint(pos)):
                     if len(blocks) > 0:
-                        start = False 
+                        start = False
                         return blocks
             # user types input
             if event.type == pygame.KEYDOWN:
@@ -54,7 +56,7 @@ def start():
                     if len(blocks) < 8:
                         blocks.append(int(input))
                         input = ''
-                        print(blocks)   
+                        print(blocks)
                 else:
                     if len(input) < 1:
                         input += event.unicode
@@ -67,54 +69,61 @@ def start():
         textRect.center = (SCREEN_WIDTH/2, (SCREEN_HEIGHT/2-100))
         screen.blit(title, textRect)
 
-        text = BASE_FONT.render('Enter number(0-5) of objects to add to row', True, BLACK)
-        text_rect = text.get_rect(center=(SCREEN_WIDTH/2,SCREEN_HEIGHT/2-40))  
+        text = BASE_FONT.render(
+            'Enter number(0-5) of objects to add to row', True, BLACK)
+        text_rect = text.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2-40))
         screen.blit(text, text_rect)
 
-        text = BASE_FONT.render('Press |START| when ready to start', True, BLACK)
-        text_rect = text.get_rect(center=(SCREEN_WIDTH/2,SCREEN_HEIGHT/2-10))  
+        text = BASE_FONT.render(
+            'Press |START| when ready to start', True, BLACK)
+        text_rect = text.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2-10))
         screen.blit(text, text_rect)
 
         pygame.draw.rect(screen, WHITE, text_box)
         text = BASE_FONT.render(input, True, BLACK)
-        screen.blit(text, (text_box.x+18,text_box.y+5))
+        screen.blit(text, (text_box.x+18, text_box.y+5))
 
         # display user input
         output = str(blocks)
         text = BASE_FONT.render(output, True, BLACK)
-        text_rect = text.get_rect(center=(SCREEN_WIDTH/2,SCREEN_HEIGHT/2+90))
+        text_rect = text.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2+90))
         screen.blit(text, text_rect)
 
         # start button
         pygame.draw.rect(screen, GREEN, start_button)
         text = BASE_FONT.render('START', True, WHITE)
         screen.blit(text, (start_button.x+4, start_button.y+3))
-        
+
         # update the screen
         pygame.display.update()
 
 # calculates WIDTH and HEIGHT based off of the number of columns and rows
 # + add rects to row_rects based on HEIGHT / row count
+
+
 def setup(blocks):
     global WIDTH, HEIGHT
 
     # calculate width and height of rectangles before entering loops
-    WIDTH = (SCREEN_WIDTH - 2 * MARGIN - (max(blocks) - 1) * SPACING) / max(blocks)
-    HEIGHT = (SCREEN_HEIGHT - 2 * MARGIN - (len(blocks) - 1) * SPACING) / len(blocks)
+    WIDTH = (SCREEN_WIDTH - 2 * MARGIN -
+             (max(blocks) - 1) * SPACING) / max(blocks)
+    HEIGHT = (SCREEN_HEIGHT - 2 * MARGIN -
+              (len(blocks) - 1) * SPACING) / len(blocks)
 
     for row in range(len(blocks)):
         row_rects.append(pygame.Rect(MARGIN, MARGIN + (HEIGHT + SPACING) * row,
-                        SCREEN_WIDTH - 2 * MARGIN, HEIGHT))
+                                     SCREEN_WIDTH - 2 * MARGIN, HEIGHT))
 
 # Set blocks in board to green if user inputs a number of objects for a row
+
+
 def set_blocks(blocks, player):
     won = False
     actions = []
     color = GREEN if player == 1 else RED
 
-
     won = all(row == 0 for row in blocks)
-    
+
     if won == True:
         return won
 
@@ -122,11 +131,11 @@ def set_blocks(blocks, player):
         for column in range(row):
             # draw the objects
             obj_rect = pygame.Rect(MARGIN + (WIDTH + SPACING) * column,
-                            MARGIN + (HEIGHT + SPACING) * idx, WIDTH, HEIGHT)
+                                   MARGIN + (HEIGHT + SPACING) * idx, WIDTH, HEIGHT)
             pygame.draw.rect(screen, color, obj_rect)
 
     text = BASE_FONT.render((f'Player {player} moves'), True, color)
-    text_rect = text.get_rect(center=(SCREEN_WIDTH/2,SCREEN_HEIGHT/6-10))  
+    text_rect = text.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/6-10))
     screen.blit(text, text_rect)
 
     pygame.draw.rect(screen, color, done_button)
@@ -135,7 +144,9 @@ def set_blocks(blocks, player):
     pygame.display.flip()
 
 # Handles events on game board
-def board_events(event,blocks):
+
+
+def board_events(event, blocks):
     global modified
     if event.type == pygame.MOUSEBUTTONDOWN:
         pos = pygame.mouse.get_pos()
@@ -145,6 +156,7 @@ def board_events(event,blocks):
                     modified = idx
                     blocks[idx] -= 1
 
+
 def actions(blocks):
     moves = []
     r = 1
@@ -153,11 +165,13 @@ def actions(blocks):
         if row != 0:
             for n in range(1, row + 1):
                 moves.append([idx, n])
-    
+
     print(moves)
     return moves
 
 # Game screen
+
+
 def game(blocks):
     run = True
     won = False
@@ -177,15 +191,15 @@ def game(blocks):
                     modified = -1
                     player = 2 if player == 1 else 1
 
-
         pos_actions = actions(blocks)
 
         won = set_blocks(blocks, player)
         if won == True:
             run = False
         screen.fill(BACKGROUND_COLOR)
-    
+
     return player
+
 
 def end(player):
     run = True
@@ -195,14 +209,15 @@ def end(player):
             if event.type == pygame.QUIT:
                 run = False
                 return run
-                
+
         color = GREEN if player == 1 else RED
 
         text = BASE_FONT.render((f'Player {player} wins'), True, color)
-        text_rect = text.get_rect(center=(SCREEN_WIDTH/2,SCREEN_HEIGHT/2))  
+        text_rect = text.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
         screen.blit(text, text_rect)
 
-        pygame.display.flip()   
+        pygame.display.flip()
+
 
 blocks = start()
 setup(blocks)
