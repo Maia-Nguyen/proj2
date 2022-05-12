@@ -53,7 +53,7 @@ class GameOfNim(Game):
         return GameState(to_move=(state.to_move + 1) % 2, utility=0, board=new_board, moves=moves)   
 
     def utility(self, state, player):
-        if player == 1:
+        if state.to_move == 'player one':
             return 1
         else:
             return -1

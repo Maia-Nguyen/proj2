@@ -56,8 +56,9 @@ def start():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 if (start_button.collidepoint(pos)):
-                    start = False 
-                    return blocks
+                    if len(blocks) > 0:
+                        start = False 
+                        return blocks
             # user types input
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
@@ -108,6 +109,13 @@ def start():
 # Set blocks in board to green if user inputs a number of objects for a row
 def set_blocks(blocks, player):
     r = 0
+    won = False
+    actions = []
+
+    won = all(row == 0 for row in blocks)
+    
+    if won == True:
+        return won
 
     # create empty grid
     for row in range(5):
@@ -138,11 +146,8 @@ def set_blocks(blocks, player):
             obj_rect = pygame.Rect((MARGIN + WIDTH) * column + (WIDTH*2),
                             (MARGIN + HEIGHT) * row + (HEIGHT*2), WIDTH, HEIGHT)
             pygame.draw.rect(screen, color, obj_rect)
-    
-    if player == 1:
-        color = GREEN
-    else:
-        color = RED
+
+    color = GREEN if player == 1 else RED
     text = BASE_FONT.render((f'Player {player} moves'), True, color)
     text_rect = text.get_rect(center=(SCREEN_WIDTH/2,SCREEN_HEIGHT/6-10))  
     screen.blit(text, text_rect)
@@ -153,7 +158,7 @@ def set_blocks(blocks, player):
     pygame.display.flip()
 
 # Handles events on game board
-def board_events(event,blocks,player):
+def board_events(event,blocks):
     if event.type == pygame.MOUSEBUTTONDOWN:
         pos = pygame.mouse.get_pos()
         for r in range(0, len(blocks)):
@@ -182,18 +187,34 @@ def board_events(event,blocks,player):
                     if blocks[r] > 0:
                         blocks[r] -= 1
                     print(blocks[r])
+
+def actions(blocks):
+    moves = []
+    r = 1
+
+    for row in blocks:
+        if row != 0:
+            n = 1
+            while n <= row:
+                moves.append([r, n])
+                n += 1
+        r += 1
     
+    print(moves)
+    return moves
+
 # Game screen
 def game(blocks):
     run = True
+    won = False
     player = 1
 
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
-                return run
-            board_events(event, blocks, player)
+                pygame.quit()
+                sys.exit()
+            board_events(event, blocks)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 # handles player handoff when user clicks 'done' button
@@ -202,11 +223,35 @@ def game(blocks):
                         player = 2
                     elif player == 2:
                         player = 1
-        print(player)
 
-        set_blocks(blocks, player)
+        pos_actions = actions(blocks)
+
+        won = set_blocks(blocks, player)
+        if won == True:
+            run = False
         screen.fill(BACKGROUND_COLOR)
+    
+    return player
+
+def end(player):
+    run = True
+
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                return run
+                
+        color = GREEN if player == 1 else RED
+
+        text = BASE_FONT.render((f'Player {player} loses'), True, color)
+        text_rect = text.get_rect(center=(SCREEN_WIDTH/2,SCREEN_HEIGHT/2))  
+        screen.blit(text, text_rect)
+
+        pygame.display.flip()   
 
 blocks = start()   
-game(blocks)
+player = game(blocks)
+end(player)
+
 pygame.quit()
