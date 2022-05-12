@@ -162,9 +162,8 @@ def actions(blocks):
     r = 1
 
     for idx, row in enumerate(blocks):
-        if row != 0:
-            for n in range(1, row + 1):
-                moves.append([idx, n])
+        for n in range(1, row + 1):
+            moves.append([idx, n])
 
     print(moves)
     return moves
