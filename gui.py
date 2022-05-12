@@ -8,35 +8,22 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (61, 117, 69)
 RED = (245, 90, 66)
-WIDTH = 50
-HEIGHT = 50
-MARGIN = 10
+WIDTH = 0
+HEIGHT = 0
+MARGIN = 100
+SPACING = 10
 SCREEN_WIDTH = 490
 SCREEN_HEIGHT = 490
 BASE_FONT = pygame.font.SysFont('arial',25)
 
+modified = -1
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption('Game of Nim')
 
 text_box = pygame.Rect(220,(SCREEN_HEIGHT/2+35), 50, 35)
 start_button = pygame.Rect(200,(SCREEN_HEIGHT/2+125), 90, 35)
 done_button = pygame.Rect(200,(SCREEN_HEIGHT/2+155), 90, 35)
-r1_rect = pygame.Rect(WIDTH*2, HEIGHT*2, 530, HEIGHT)
-r2_rect = pygame.Rect(WIDTH*2, (MARGIN + HEIGHT) + (HEIGHT*2), 530, HEIGHT)
-r3_rect = pygame.Rect(WIDTH*2, (MARGIN + HEIGHT) * 2 + (HEIGHT*2), 530, HEIGHT)
-r4_rect = pygame.Rect(WIDTH*2, (MARGIN + HEIGHT) * 3  + (HEIGHT*2), 530, HEIGHT)
-r5_rect = pygame.Rect(WIDTH*2, (MARGIN + HEIGHT) * 4 + (HEIGHT*2), 530, HEIGHT)
-r6_rect = pygame.Rect(WIDTH*2, (MARGIN + HEIGHT) * 5 + (HEIGHT*2), 530, HEIGHT)
-r7_rect = pygame.Rect(WIDTH*2, (MARGIN + HEIGHT) * 6 + (HEIGHT*2), 530, HEIGHT)
-r8_rect = pygame.Rect(WIDTH*2, (MARGIN + HEIGHT) * 7 + (HEIGHT*2), 530, HEIGHT)
-r9_rect = pygame.Rect(WIDTH*2, (MARGIN + HEIGHT) * 8 + (HEIGHT*2), 530, HEIGHT)
-
-# Create board
-grid = []
-for row in range(5):
-    grid.append([])
-    for column in range(5):
-        grid[row].append(0)
+row_rects = []
 
 # Start Menu
 def start():
@@ -64,7 +51,7 @@ def start():
                 if event.key == pygame.K_BACKSPACE:
                     input = input[:-1]
                 if event.key == pygame.K_RETURN:
-                    if len(blocks) < 5:
+                    if len(blocks) < 8:
                         blocks.append(int(input))
                         input = ''
                         print(blocks)   
@@ -106,48 +93,36 @@ def start():
         # update the screen
         pygame.display.update()
 
+def setup(blocks):
+    global WIDTH, HEIGHT
+
+    # calculate width and height of rectangles before entering loops
+    WIDTH = (SCREEN_WIDTH - 2 * MARGIN - (max(blocks) - 1) * SPACING) / max(blocks)
+    HEIGHT = (SCREEN_HEIGHT - 2 * MARGIN - (len(blocks) - 1) * SPACING) / len(blocks)
+
+    for row in range(len(blocks)):
+        row_rects.append(pygame.Rect(MARGIN, MARGIN + (HEIGHT + SPACING) * row,
+                        SCREEN_WIDTH - 2 * MARGIN, HEIGHT))
+
 # Set blocks in board to green if user inputs a number of objects for a row
 def set_blocks(blocks, player):
-    r = 0
     won = False
     actions = []
+    color = GREEN if player == 1 else RED
+
 
     won = all(row == 0 for row in blocks)
     
     if won == True:
         return won
 
-    # create empty grid
-    for row in range(5):
-        for column in range(5):
-            grid[row][column] = 0
-
-    # for each index from user input, populate row with number 1
-    # example, user inputs [1,2,1]
-    # row 1 col 1 = 1, row 2 col 1 = 1, row 2 col 2 = 1, row 3 col 1 = 1
-    for row in blocks:
-        c = 0
-        while c < row:
-            grid[r][c] = 1
-            c += 1
-        r+=1
-
-    for row in range(5):
-        for column in range(5):
-            color = WHITE
-            # since we populated the grid with 1's depending on user input, set the board
-            # by creating color blocks
-            if grid[row][column] == 1:
-                if player == 1:
-                    color = GREEN
-                else:
-                    color = RED
+    for idx, row in enumerate(blocks):
+        for column in range(row):
             # draw the objects
-            obj_rect = pygame.Rect((MARGIN + WIDTH) * column + (WIDTH*2),
-                            (MARGIN + HEIGHT) * row + (HEIGHT*2), WIDTH, HEIGHT)
+            obj_rect = pygame.Rect(MARGIN + (WIDTH + SPACING) * column,
+                            MARGIN + (HEIGHT + SPACING) * idx, WIDTH, HEIGHT)
             pygame.draw.rect(screen, color, obj_rect)
 
-    color = GREEN if player == 1 else RED
     text = BASE_FONT.render((f'Player {player} moves'), True, color)
     text_rect = text.get_rect(center=(SCREEN_WIDTH/2,SCREEN_HEIGHT/6-10))  
     screen.blit(text, text_rect)
@@ -159,40 +134,23 @@ def set_blocks(blocks, player):
 
 # Handles events on game board
 def board_events(event,blocks):
+    global modified
     if event.type == pygame.MOUSEBUTTONDOWN:
         pos = pygame.mouse.get_pos()
-        if(r1_rect.collidepoint(pos)):
-            if blocks[0] > 0:
-                blocks[0] -= 1
-            print(blocks[0])
-        if(r2_rect.collidepoint(pos)):
-            if blocks[1] > 0:
-                blocks[1] -= 1
-            print(blocks[1])
-        if(r3_rect.collidepoint(pos)):
-            if blocks[2] > 0:
-                blocks[2] -= 1
-            print(blocks[2])
-        if(r4_rect.collidepoint(pos)):
-            if blocks[3] > 0:
-                blocks[3] -= 1
-            print(blocks[3])
-        if(r5_rect.collidepoint(pos)):
-            if blocks[4] > 0:
-                blocks[4] -= 1
-            print(blocks[4])
+        for idx, rect in enumerate(row_rects):
+            if(rect.collidepoint(pos) and (modified == idx or modified == -1)):
+                if blocks[idx] > 0:
+                    modified = idx
+                    blocks[idx] -= 1
 
 def actions(blocks):
     moves = []
     r = 1
 
-    for row in blocks:
+    for idx, row in enumerate(blocks):
         if row != 0:
-            n = 1
-            while n <= row:
-                moves.append([r, n])
-                n += 1
-        r += 1
+            for n in range(1, row + 1):
+                moves.append([idx, n])
     
     print(moves)
     return moves
@@ -210,13 +168,13 @@ def game(blocks):
                 sys.exit()
             board_events(event, blocks)
             if event.type == pygame.MOUSEBUTTONDOWN:
+                global modified
                 pos = pygame.mouse.get_pos()
                 # handles player handoff when user clicks 'done' button
-                if(done_button.collidepoint(pos)):
-                    if player == 1:
-                        player = 2
-                    elif player == 2:
-                        player = 1
+                if(done_button.collidepoint(pos) and modified != -1):
+                    modified = -1
+                    player = 2 if player == 1 else 1
+
 
         pos_actions = actions(blocks)
 
@@ -244,7 +202,8 @@ def end(player):
 
         pygame.display.flip()   
 
-blocks = start()   
+blocks = start()
+setup(blocks)
 player = game(blocks)
 end(player)
 
