@@ -173,7 +173,7 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
 
 
 # ______________________________________________________________________________
-# Functinos for cutoff search
+# Functions for cutoff search
 
 def zero_nim_sum(blocks):
     return bin(reduce(lambda x, y: x ^ y, blocks))[2:] == '0'
