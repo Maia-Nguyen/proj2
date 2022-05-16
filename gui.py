@@ -1,3 +1,6 @@
+from game_of_nim import GameOfNim
+from games import *
+
 import pygame
 import sys
 
@@ -177,6 +180,16 @@ def game(blocks):
     player = 1
 
     while run:
+        if player == 2:
+            # grab player 2's best move
+            nim = GameOfNim(board=blocks, to_move=0)
+            move = alpha_beta_search(nim.initial, nim)
+            # modify the current blocks array
+            blocks[move[0]] -= move[1]
+            for block in blocks:
+                if block is not 0:
+                    player = 1
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -189,8 +202,6 @@ def game(blocks):
                 if(done_button.collidepoint(pos) and modified != -1):
                     modified = -1
                     player = 2 if player == 1 else 1
-
-        pos_actions = actions(blocks)
 
         won = set_blocks(blocks, player)
         if won == True:

@@ -6,7 +6,7 @@ class GameOfNim(Game):
         The winner is the player that takes the last object(s). '''
     
     # YOUR CODE GOES HERE
-    def __init__(self, board=[]):
+    def __init__(self, board=[], to_move=1):
         """ Define goal state and initialize a problem """
         moves = []
 
@@ -15,7 +15,7 @@ class GameOfNim(Game):
                 moves.append([idx, n])
 
 
-        self.initial = GameState(to_move=1, utility=0, board=board, moves=moves)   
+        self.initial = GameState(to_move=to_move, utility=0, board=board, moves=moves)
 
     def actions(self, state):
         moves = []
