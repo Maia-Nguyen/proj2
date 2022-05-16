@@ -183,7 +183,11 @@ def game(blocks):
         if player == 2:
             # grab player 2's best move
             nim = GameOfNim(board=blocks, to_move=0)
-            move = alpha_beta_search(nim.initial, nim)
+
+            # We only look one level into the choices because
+            # we can immediately choose a desirable one if possible
+            move = alpha_beta_cutoff_search(nim.initial, nim, d=1, eval_fn=nim_sum_eval)
+
             # modify the current blocks array
             blocks[move[0]] -= move[1]
             for block in blocks:

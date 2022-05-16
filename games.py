@@ -4,6 +4,7 @@ import copy
 import itertools
 import random
 from collections import namedtuple
+from functools import reduce
 
 import numpy as np
 
@@ -170,6 +171,19 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
             best_action = a
     return best_action
 
+
+# ______________________________________________________________________________
+# Functinos for cutoff search
+
+def zero_nim_sum(blocks):
+    return bin(reduce(lambda x, y: x ^ y, blocks))[2:] == '0'
+
+# If a move will leave us in zero nim sum, we want it to be worth less.
+def nim_sum_eval(state):
+    if zero_nim_sum(state.board):
+        return -1
+    else:
+        return 1
 
 # ______________________________________________________________________________
 # Players for Games
